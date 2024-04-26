@@ -16,7 +16,7 @@ jobs:
         node-version: [20]
     defaults:
       run:
-        working-directory: ./frontend
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
+          cache-dependency-path: frontend
       - name: Install dependencies
         run: pnpm install
       - name: Typecheck

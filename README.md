@@ -4,6 +4,8 @@
 
 This is a simple full stack application that uses a Go backend with OAuth2 to authenticate users with Discord and Google. The frontend is a React application built with Vite. The whole application with SSL certificate generation is dockerized.
 
+It is based on [go-oauth2-backend](https://github.com/WieseChristoph/go-oauth2-backend).
+
 ## Environment Variables
 
 Copy the `.env.example` file to `.env` and fill in the values or set the environment variables manually.

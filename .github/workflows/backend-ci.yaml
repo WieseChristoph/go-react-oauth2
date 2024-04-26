@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-20.04
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -26,4 +26,4 @@ jobs:
         uses: golangci/golangci-lint-action@v5
         with:
           version: latest
-          args: run
+          working-directory: backend

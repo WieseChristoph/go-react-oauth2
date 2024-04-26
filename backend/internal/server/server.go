@@ -47,15 +47,20 @@ func NewServer() *http.Server {
 		log.Fatalf("Error migrating database. Err: %v", err)
 	}
 
-	// Register cron jobs
 	c := cron.New()
-	c.AddFunc("@daily", func() {
+
+	// Add cron job to delete expired sessions
+	_, err = c.AddFunc("@daily", func() {
 		log.Infoln("Runing cron job: DeleteExpiredSessions")
 		err := repos.Session.DeleteExpiredSessions()
 		if err != nil {
 			log.Errorf("Error deleting expired sessions from database. Err: %v", err)
 		}
 	})
+	if err != nil {
+		log.Fatalf("Error adding cron job. Err: %v", err)
+	}
+
 	c.Start()
 
 	// Declare Server config

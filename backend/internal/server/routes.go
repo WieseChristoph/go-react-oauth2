@@ -41,7 +41,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 }
 
 func (s *Server) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World!"))
+	_, err := w.Write([]byte("Hello, World!"))
+	if err != nil {
+		log.Errorf("Error writing response. Err: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) getAuthBeginHandler(w http.ResponseWriter, r *http.Request) {
