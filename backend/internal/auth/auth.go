@@ -192,12 +192,13 @@ func (a *auth) HandleOAuth2Callback(w http.ResponseWriter, r *http.Request) erro
 		return err
 	}
 
-	// Format IP address
-	ipAddress := r.RemoteAddr
-	if lastIndex := strings.LastIndex(ipAddress, ":"); lastIndex != -1 {
-		ipAddress = ipAddress[0:lastIndex]
+	// Get forwarded IP address
+	// (maybe also change db schema to store ip as text instead of inet for better compatibility)
+	ipAddress := r.Header.Get("X-Forwarded-For")
+	ips := strings.Split(ipAddress, ",")
+	if len(ips) > 0 {
+		ipAddress = ips[0]
 	}
-	ipAddress = strings.Trim(ipAddress, "[]")
 
 	// Create session
 	session := models.NewSession(
