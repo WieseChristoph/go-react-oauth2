@@ -1,0 +1,28 @@
+server {
+    listen 80;
+    listen [::]:80;
+
+    resolver 127.0.0.11 valid=30s;
+
+    location / {
+        set $target http://frontend;
+        proxy_pass $target;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Upgrade $http_upgrade;
+    }
+
+    location ~ ^/(api|auth)/ {
+        set $target http://backend;
+        proxy_pass $target;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Upgrade $http_upgrade;
+    }
+}

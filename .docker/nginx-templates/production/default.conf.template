@@ -1,0 +1,40 @@
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name $DOMAIN;
+    
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
+
+    resolver 127.0.0.11 valid=30s;
+
+    location / {
+        set $target http://frontend;
+        proxy_pass $target;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    location ~ ^/(api|auth)/ {
+        set $target http://backend;
+        proxy_pass $target;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name $DOMAIN;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}

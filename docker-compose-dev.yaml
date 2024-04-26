@@ -1,0 +1,69 @@
+version: "3.8"
+
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - 8080:80
+    volumes:
+      - ./.docker/nginx-templates/development:/etc/nginx/templates
+  frontend:
+    container_name: frontend
+    build:
+      context: ./.docker
+      dockerfile: NodePNPM.Dockerfile
+    command: sh -c "pnpm install && pnpm run dev --port 80 --host"
+    restart: unless-stopped
+    depends_on:
+      - backend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+  backend:
+    container_name: backend
+    build:
+      context: ./.docker
+      dockerfile: GoAir.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    working_dir: /app
+    environment:
+      APP_URL: ${APP_URL}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    volumes:
+      - ./backend:/app
+  db:
+    container_name: db
+    image: postgres:latest
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_volume:

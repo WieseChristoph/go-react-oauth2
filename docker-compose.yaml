@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_started
+      backend:
+        condition: service_started
+      certbot:
+        condition: service_completed_successfully
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      DOMAIN: ${CERTBOT_DOMAIN}
+    volumes:
+      - ./.docker/nginx-templates/production:/etc/nginx/templates
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+  certbot:
+    container_name: certbot
+    image: certbot/certbot:latest
+    command: certonly --standalone --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --keep-until-expiring -d ${CERTBOT_DOMAIN}
+    ports:
+      - 80:80
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_URL: ${APP_URL}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+  db:
+    container_name: db
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_volume:
