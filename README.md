@@ -1,6 +1,6 @@
 # Go React OAuth2
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/WieseChristoph/go-react-oauth2)](https://goreportcard.com/report/github.com/WieseChristoph/go-react-oauth2)
+[![Go Report Card](https://goreportcard.com/badge/github.com/WieseChristoph/go-react-oauth2/backend)](https://goreportcard.com/report/github.com/WieseChristoph/go-react-oauth2/backend)
 
 This is a simple full stack application that uses a Go backend with OAuth2 to authenticate users with Discord and Google. The frontend is a React application built with Vite. The whole application with SSL certificate generation is dockerized.
 
