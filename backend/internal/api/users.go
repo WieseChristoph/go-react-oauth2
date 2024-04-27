@@ -21,6 +21,7 @@ func (a *api) GetUsersMe(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Errorf("Error handling JSON marshal. Err: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 
 	_, _ = w.Write(userJson)
@@ -38,6 +39,7 @@ func (a *api) GetUsersAll(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Errorf("Error handling JSON marshal. Err: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 
 	_, _ = w.Write(usersJson)
