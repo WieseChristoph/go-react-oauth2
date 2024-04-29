@@ -22,14 +22,17 @@ func NewAccountRepository(db *database.DB) AccountRepository {
 }
 
 func (r *accountRepository) CreateAccount(account *models.Account) (int, error) {
-	dbAccount := account.ToDBAccount()
-
 	var id int
+
+	if err := account.Validate(); err != nil {
+		return id, err
+	}
+
 	err := r.db.QueryRow(`
 		INSERT INTO account (user_id, provider, provider_account_id, access_token, refresh_token, expires_at, scope)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id
-	`, dbAccount.UserID, dbAccount.Provider, dbAccount.ProviderAccountID, dbAccount.AccessToken, dbAccount.RefreshToken, dbAccount.ExpiresAt, dbAccount.Scope).Scan(&id)
+	`, account.UserID, account.Provider, account.ProviderAccountID, account.AccessToken, account.RefreshToken, account.ExpiresAt, account.Scope).Scan(&id)
 	if err != nil {
 		return id, err
 	}
@@ -38,13 +41,15 @@ func (r *accountRepository) CreateAccount(account *models.Account) (int, error) 
 }
 
 func (r *accountRepository) UpdateAccount(account *models.Account) error {
-	dbAccount := account.ToDBAccount()
+	if err := account.Validate(); err != nil {
+		return err
+	}
 
 	_, err := r.db.Exec(`
 		UPDATE account
 		SET access_token = $1, refresh_token = $2, expires_at = $3
 		WHERE id = $4
-	`, dbAccount.AccessToken, dbAccount.RefreshToken, dbAccount.ExpiresAt, dbAccount.ID)
+	`, account.AccessToken, account.RefreshToken, account.ExpiresAt, account.ID)
 	if err != nil {
 		return err
 	}

@@ -4,12 +4,12 @@ import apiRequest from "@/utils/apiRequest";
 
 export const GET_USER_QUERY_KEY = "getUser";
 
-async function getUser() {
+async function fetchUser() {
   return apiRequest("/users/me", "GET");
 }
 
 function useGetUser() {
-  return useQuery<User, Error>(GET_USER_QUERY_KEY, getUser, {
+  return useQuery<User, Error>(GET_USER_QUERY_KEY, fetchUser, {
     refetchOnWindowFocus: false,
   });
 }

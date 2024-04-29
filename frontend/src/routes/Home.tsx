@@ -1,9 +1,11 @@
-import { type FC } from "react";
 import useAuth from "@/hooks/useAuth";
 
 import UserProfile from "@/components/UserProfile";
+import GoogleLoginButton from "@/components/GoogleLoginButton";
+import DiscordLoginButton from "@/components/DiscordLoginButton";
+import LogoutButton from "@/components/LogoutButton";
 
-const Home: FC = () => {
+const Home: React.FC = () => {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   return (
@@ -14,32 +16,12 @@ const Home: FC = () => {
       ) : isAuthenticated && user ? (
         <>
           <UserProfile user={user} />
-          <a
-            href="/auth/logout"
-            className="rounded-sm bg-red-900 px-3 py-2 font-bold"
-          >
-            Logout
-          </a>
+          <LogoutButton />
         </>
       ) : (
         <>
-          <a
-            href="/auth/discord"
-            className="rounded-sm bg-[#5865F2] px-3 py-2 font-bold"
-          >
-            Login with Discord
-          </a>
-          <a
-            href="/auth/google"
-            className="rounded-sm bg-white px-3 py-2 font-bold text-black"
-          >
-            Login with <span className="text-[#4285F4]">G</span>
-            <span className="text-[#EA4335]">o</span>
-            <span className="text-[#FBBC04]">o</span>
-            <span className="text-[#4285F4]">g</span>
-            <span className="text-[#34A853]">l</span>
-            <span className="text-[#EA4335]">e</span>
-          </a>
+          <GoogleLoginButton />
+          <DiscordLoginButton />
         </>
       )}
     </div>

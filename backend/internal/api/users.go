@@ -17,7 +17,7 @@ func (a *api) GetUsersMe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userJson, err := json.Marshal(user)
+	userJson, err := json.Marshal(user.ToAPIUser())
 	if err != nil {
 		log.Errorf("Error handling JSON marshal. Err: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -35,7 +35,12 @@ func (a *api) GetUsersAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usersJson, err := json.Marshal(users)
+	apiUsers := make([]*models.APIUser, 0, len(users))
+	for _, user := range users {
+		apiUsers = append(apiUsers, user.ToAPIUser())
+	}
+
+	usersJson, err := json.Marshal(apiUsers)
 	if err != nil {
 		log.Errorf("Error handling JSON marshal. Err: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -157,9 +157,7 @@ func (a *auth) HandleOAuth2Callback(w http.ResponseWriter, r *http.Request) erro
 		}
 	} else {
 		// Update account
-		account.AccessToken = token.AccessToken
-		account.RefreshToken = token.RefreshToken
-		account.ExpiresAt = token.Expiry
+		account.UpdateTokens(token.AccessToken, token.RefreshToken, token.Expiry)
 		err = a.repositories.Account.UpdateAccount(account)
 		if err != nil {
 			return err

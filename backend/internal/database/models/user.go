@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 )
 
@@ -12,7 +13,12 @@ const (
 	RoleAdmin Role = "admin"
 )
 
-type User struct {
+var (
+	ErrInvalidUserName = errors.New("invalid user name")
+	ErrInvalidRole     = errors.New("invalid role")
+)
+
+type APIUser struct {
 	ID          int       `json:"id"`
 	Name        string    `json:"name"`
 	DisplayName string    `json:"display_name"`
@@ -23,40 +29,67 @@ type User struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-type DBUser struct {
+type User struct {
 	ID          int            `json:"id"`
-	Name        sql.NullString `json:"name"`
+	Name        string         `json:"name"`
 	DisplayName sql.NullString `json:"display_name"`
 	Email       sql.NullString `json:"email"`
 	Avatar      sql.NullString `json:"avatar"`
-	Role        sql.NullString `json:"role"`
+	Role        Role           `json:"role"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 }
 
 func NewUser(name, displayName, email, avatar string, role Role) *User {
+	if role == "" {
+		role = RoleUser
+	}
+
 	return &User{
 		Name:        name,
-		DisplayName: displayName,
-		Email:       email,
-		Avatar:      avatar,
+		DisplayName: sql.NullString{String: displayName, Valid: displayName != ""},
+		Email:       sql.NullString{String: email, Valid: email != ""},
+		Avatar:      sql.NullString{String: avatar, Valid: avatar != ""},
 		Role:        role,
 	}
 }
 
-func (u *User) ToDBUser() *DBUser {
-	if u.Role == "" {
-		u.Role = RoleUser
+func (u *User) Validate() error {
+	if u.Name == "" {
+		return ErrInvalidUserName
 	}
 
-	return &DBUser{
+	if u.Role != RoleUser && u.Role != RoleAdmin {
+		return ErrInvalidRole
+	}
+
+	return nil
+}
+
+func (u *User) ToAPIUser() *APIUser {
+	return &APIUser{
 		ID:          u.ID,
-		Name:        sql.NullString{String: u.Name, Valid: u.Name != ""},
-		DisplayName: sql.NullString{String: u.DisplayName, Valid: u.DisplayName != ""},
-		Email:       sql.NullString{String: u.Email, Valid: u.Email != ""},
-		Avatar:      sql.NullString{String: u.Avatar, Valid: u.Avatar != ""},
-		Role:        sql.NullString{String: string(u.Role), Valid: u.Role != ""},
+		Name:        u.Name,
+		DisplayName: u.DisplayName.String,
+		Email:       u.Email.String,
+		Avatar:      u.Avatar.String,
+		Role:        u.Role,
 		CreatedAt:   u.CreatedAt,
 		UpdatedAt:   u.UpdatedAt,
 	}
+}
+
+func (u *APIUser) ToUser() *User {
+	user := NewUser(
+		u.Name,
+		u.DisplayName,
+		u.Email,
+		u.Avatar,
+		u.Role,
+	)
+	user.ID = u.ID
+	user.CreatedAt = u.CreatedAt
+	user.UpdatedAt = u.UpdatedAt
+
+	return user
 }

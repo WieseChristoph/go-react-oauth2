@@ -26,14 +26,17 @@ func NewSessionRepository(db *database.DB) SessionRepository {
 }
 
 func (r *sessionRepository) CreateSession(session *models.Session) (int, error) {
-	dbSession := session.ToDBSession()
-
 	var id int
+
+	if err := session.Validate(); err != nil {
+		return id, err
+	}
+
 	err := r.db.QueryRow(`
 		INSERT INTO session (token, user_id, ip_address, expires_at)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id
-	`, dbSession.Token, dbSession.UserID, dbSession.IPAddress, dbSession.ExpiresAt).Scan(&id)
+	`, session.Token, session.UserID, session.IPAddress, session.ExpiresAt).Scan(&id)
 	if err != nil {
 		return id, err
 	}

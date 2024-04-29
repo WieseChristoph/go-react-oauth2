@@ -18,8 +18,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RealIP)
 
-	r.Get("/", s.GetIndexHandler)
-
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Use(s.middleware.AuthMiddleware)
 		r.Route("/users", func(r chi.Router) {
@@ -38,14 +36,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 	})
 
 	return r
-}
-
-func (s *Server) GetIndexHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte("Hello, World!"))
-	if err != nil {
-		log.Errorf("Error writing response. Err: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
 }
 
 func (s *Server) getAuthBeginHandler(w http.ResponseWriter, r *http.Request) {

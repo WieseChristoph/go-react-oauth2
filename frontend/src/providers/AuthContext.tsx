@@ -1,10 +1,4 @@
-import {
-  type FC,
-  createContext,
-  type ReactNode,
-  useState,
-  useEffect,
-} from "react";
+import { createContext, type ReactNode, useState, useEffect } from "react";
 import useGetUser from "@/hooks/useGetUser";
 import type User from "@/types/User";
 
@@ -20,7 +14,7 @@ export const AuthContext = createContext<AuthContextType>({
   user: undefined,
 });
 
-const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
+const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | undefined>(undefined);
 

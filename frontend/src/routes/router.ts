@@ -11,12 +11,12 @@ const rootRoute = createRootRoute({
   component: Root,
 });
 
-const routeTree = rootRoute.addChildren([
-  createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/",
-    component: Home,
-  }),
-]);
+const homeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: Home,
+});
+
+const routeTree = rootRoute.addChildren([homeRoute]);
 
 export default createRouter({ routeTree });

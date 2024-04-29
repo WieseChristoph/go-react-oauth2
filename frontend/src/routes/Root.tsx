@@ -1,8 +1,6 @@
-import { type FC } from "react";
-
 import { Outlet } from "@tanstack/react-router";
 
-const Root: FC = () => {
+const Root: React.FC = () => {
   return (
     <>
       <main className="p-3">

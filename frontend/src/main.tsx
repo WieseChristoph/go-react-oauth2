@@ -5,7 +5,7 @@ import router from "@/routes/router";
 import { RouterProvider } from "@tanstack/react-router";
 import AuthProvider from "@/providers/AuthContext";
 
-import "./index.css";
+import "@/index.css";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false } },

@@ -1,7 +1,16 @@
-import { FC } from "react";
 import User from "@/types/User";
 
-const UserProfile: FC<{ user: User }> = ({ user }) => {
+const ProfileField: React.FC<{ label: string; value: string }> = ({
+  label,
+  value,
+}) => (
+  <p className="flex justify-between gap-5">
+    <span className="font-bold">{label}</span>
+    <span>{value}</span>
+  </p>
+);
+
+const UserProfile: React.FC<{ user: User }> = ({ user }) => {
   return (
     <div className="flex items-center gap-3 border border-white p-3 text-white">
       <img
@@ -10,34 +19,13 @@ const UserProfile: FC<{ user: User }> = ({ user }) => {
         referrerPolicy="no-referrer"
       />
       <div>
-        <p className="flex justify-between gap-5">
-          <span className="font-bold">ID</span>
-          <span className="">{user.id}</span>
-        </p>
-        <p className="flex justify-between gap-5">
-          <span className="font-bold">Name</span>
-          <span>{user.name}</span>
-        </p>
-        <p className="flex justify-between gap-5">
-          <span className="font-bold">Display Name</span>
-          <span>{user.display_name}</span>
-        </p>
-        <p className="flex justify-between gap-5">
-          <span className="font-bold">E-Mail</span>
-          <span>{user.email}</span>
-        </p>
-        <p className="flex justify-between gap-5">
-          <span className="font-bold">Role</span>
-          <span>{user.role}</span>
-        </p>
-        <p className="flex justify-between gap-5">
-          <span className="font-bold">Created At</span>
-          <span>{user.created_at}</span>
-        </p>
-        <p className="flex justify-between gap-5">
-          <span className="font-bold">Updated At</span>
-          <span>{user.updated_at}</span>
-        </p>
+        <ProfileField label="ID" value={user.id.toString()} />
+        <ProfileField label="Name" value={user.name} />
+        <ProfileField label="Display Name" value={user.display_name} />
+        <ProfileField label="E-Mail" value={user.email} />
+        <ProfileField label="Role" value={user.role} />
+        <ProfileField label="Created At" value={user.created_at} />
+        <ProfileField label="Updated At" value={user.updated_at} />
       </div>
     </div>
   );

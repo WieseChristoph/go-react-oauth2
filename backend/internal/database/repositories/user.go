@@ -24,14 +24,17 @@ func NewUserRepository(db *database.DB) UserRepository {
 }
 
 func (r *userRepository) CreateUser(user *models.User) (int, error) {
-	dbUser := user.ToDBUser()
-
 	var id int
+
+	if err := user.Validate(); err != nil {
+		return id, err
+	}
+
 	err := r.db.QueryRow(`
 		INSERT INTO user_data (name, display_name, email, avatar, role)
 		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id
-	`, dbUser.Name, dbUser.DisplayName, dbUser.Email, dbUser.Avatar, dbUser.Role).Scan(&id)
+	`, user.Name, user.DisplayName, user.Email, user.Avatar, user.Role).Scan(&id)
 	if err != nil {
 		return id, err
 	}
@@ -40,13 +43,15 @@ func (r *userRepository) CreateUser(user *models.User) (int, error) {
 }
 
 func (r *userRepository) UpdateUser(user *models.User) error {
-	dbUser := user.ToDBUser()
+	if err := user.Validate(); err != nil {
+		return err
+	}
 
 	_, err := r.db.Exec(`
 		UPDATE user_data
 		SET name = $1, display_name = $2, email = $3, avatar = $4, role = $5
 		WHERE id = $6
-	`, dbUser.Name, dbUser.DisplayName, dbUser.Email, dbUser.Avatar, dbUser.Role, dbUser.ID)
+	`, user.Name, user.DisplayName, user.Email, user.Avatar, user.Role, user.ID)
 	if err != nil {
 		return err
 	}
